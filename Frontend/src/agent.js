@@ -3,18 +3,17 @@ import _superagent from 'superagent';
 import md5 from 'md5';
 const superagent = superagentPromise(_superagent, global.Promise);
 
-// const API_ROOT = 'https://conduit.productionready.io/api';
 const API_ROOT = 'http://localhost:4100';
-// const encode = encodeURIComponent;
 const responseBody = res => res.body;
 
 let token = null;
 const tokenPlugin = req => {
 	if (token) {
 		req.set('authorization', `Token ${token}`);
-	}//TODO
+	}
 }
 
+// NEED TO USE PROPER FUNCTION TO SENDING DATA
 const requests = {
 	del: url =>
 		superagent.del(`${API_ROOT}${url}`).use(tokenPlugin).then(responseBody),
@@ -33,12 +32,13 @@ const Apps = {
 		requests.get(`/apps/create/${name}&${description}`),
 	assign: (appId, userId) =>
 		requests.get(`/apps/assign/${appId}&${userId}`),
-	all: () =>//props
-		requests.get(`/apps`),//?${limit(10, page)}`),
+	all: () =>
+		requests.get(`/apps`),//TODO List pagination
 	byAuthor: (author) =>
 		requests.get(`/apps/programmer/${author}}`),
 	get: id =>
 		requests.get(`/apps/${id}`),
+	//TODO Connect with database
 	// update: app =>
 	// 	requests.get(`/apps/edit/${app.id}&${app.description}`),
 	upgrade: (id, appState) =>
@@ -53,15 +53,16 @@ const Bugs = {
 	assign: (bugId, userId) =>
 		requests.get(`/bugs/assign/${bugId}&${userId}`),
 	all: () =>
-		requests.get(`/bugs?${limit(10, 0)}`),
+		requests.get(`/bugs?${limit(10, 0)}`),//TODO List pagination
 	byAuthor: (author) =>
-		requests.get(`/bugs/user/${author}`),
+		requests.get(`/bugs/user/${author}`),//TODO List pagination
 	byTag: (tag) =>
-		requests.get(`/bugs/bugtype/${tag}`),
+		requests.get(`/bugs/bugtype/${tag}`),//TODO List pagination
 	byApp: (app) =>
-		requests.get(`/bugs/app/${app}`),
+		requests.get(`/bugs/app/${app}`),//TODO List pagination
 	byProgrammer: (programmer) =>
-		requests.get(`/bugs/programmer/${programmer}`),
+		requests.get(`/bugs/programmer/${programmer}`),//TODO List pagination
+	//TODO Connect with database
 	// edit: (idBug,details,appId,bugId) =>
 	// 	requests.get(`/bugs/edit/${idBug}&${details}&${appId}&${bugId}`),
 	finish: id =>
@@ -69,12 +70,12 @@ const Bugs = {
 	get: id =>
 		requests.get(`/bugs/${id}`),
 	search: (id, tag) =>
-		requests.get(`/bugs/bugtype/${tag}&${id}`)
+		requests.get(`/bugs/bugtype/${tag}&${id}`)//TODO List pagination
 }
 
 const Users = {
 	all: () =>
-		requests.get(`/users`),
+		requests.get(`/users`),//TODO List pagination
 	admin: () =>
 		requests.get(`/users/admin`),
 	get: id =>
@@ -89,6 +90,7 @@ const Users = {
 		requests.get(`/users/programmer/${app}`),
 	programmers: () =>
 		requests.get(`/users/programmer`),
+	//TODO Connect with database
 	// resetpass: (mail,pass) =>{
 	// password = md5(password);
 	// return requests.get(`/users/resetpass/${mail}&${pass}`);},
@@ -103,7 +105,6 @@ const Auth = {
 	profile: username =>
 		requests.get(`/auth/${username}`),
 	login: (mail, password) => {
-		// requests.post(`/auth/login`, { user: { email, password } }),
 		password = md5(password);
 		return requests.get(`/auth/login/${mail}&${password}`);
 	},
@@ -121,43 +122,6 @@ const Auth = {
 const Tags = {
 	all: () => requests.get(`/bugtypes`)
 };
-
-// const omitSlug = article => Object.assign({}, article, { slug: undefined })
-// const Articles = {
-// 	all: page =>
-// 		// requests.get(`/articles?${limit(10, page)}`),
-// 		requests.get(`/apps`),
-// 	byAuthor: (author, page) =>
-// 		requests.get(`/articles?author=${encode(author)}&${limit(5, page)}`),
-// 	byTag: (tag, page) =>
-// 		requests.get(`/apps?tag=${encode(tag)}&${limit(10, page)}`),
-// 	del: slug =>
-// 		requests.del(`/articles/${slug}`),
-// 	favorite: slug =>
-// 		requests.post(`/articles/${slug}/favorite`),
-// 	favoritedBy: (author, page) =>
-// 		requests.get(`/articles?favorited=${encode(author)}&${limit(5, page)}`),
-// 	feed: () =>
-// 		// requests.get('/articles/feed?limit=10&offset=0'),
-// 		requests.get(`/apps`),
-// 	get: slug =>
-// 		requests.get(`/articles/${slug}`),
-// 	unfavorite: slug =>
-// 		requests.del(`/articles/${slug}/favorite`),
-// 	update: article =>
-// 		requests.put(`/articles/${article.slug}`, { article: omitSlug(article) }),
-// 	create: article =>
-// 		requests.post(`/articles`, { article })
-// };
-
-// const Comments = {
-// 	create: (slug, comment) =>
-// 		requests.post(`/articles/${slug}/comments`, { comment }),
-// 	delete: (slug, commentId) =>
-// 		requests.del(`/articles/${slug}/comments/${commentId}`),
-// 	forArticle: slug =>
-// 		requests.get(`/articles/${slug}/comments`)
-// };
 
 export default {
 	Auth,
