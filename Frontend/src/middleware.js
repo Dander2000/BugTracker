@@ -45,6 +45,7 @@ const promiseMiddleware = store => next => action => {
 };
 
 const localStorageMiddleware = store => next => action => {
+	//TODO change saving item from Local storage to Cookies
 	if (action.type === REGISTER || action.type === LOGIN) {
 		if (!action.error) {
 			window.localStorage.setItem('jwt', action.payload.token);
