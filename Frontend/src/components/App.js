@@ -7,7 +7,6 @@ import { Route, Switch } from 'react-router-dom';
 import Home from '../components/Home';
 import Login from '../components/Login';
 import Register from '../components/Register';
-// import Settings from '../components/Settings';
 import { store } from '../store';
 import { push } from 'react-router-redux';
 import { withRouter } from 'react-router';
@@ -42,7 +41,6 @@ const mapDispatchToProps = dispatch => ({
 class App extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.redirectTo) {
-			// this.context.router.replace(nextProps.redirectTo);
 			store.dispatch(push(nextProps.redirectTo));
 			this.props.onRedirect();
 		}
@@ -54,8 +52,7 @@ class App extends React.Component {
 		if (token) {
 			agent.setToken(token);
 		}
-		// this.props.onLoad(token ? agent.Auth.current() : null, token);
-		this.props.onLoad(agent.Auth.current(), token);
+		this.props.onLoad(token ? agent.Auth.current() : null, token);
 	}
 
 	render() {
@@ -79,7 +76,6 @@ class App extends React.Component {
 						<Route path="/users/:id" component={withRouter(User)} />
 						<Route exact path="/adminPanel" component={AdminPanel} />
 						<Route path="/" component={Error404} />
-						{/* <Route path="/settings" component={Settings} /> */}
 					</Switch>
 				</div>
 			);
