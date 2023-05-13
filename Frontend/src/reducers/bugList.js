@@ -10,6 +10,7 @@ import {
 	PROGRAMMER_LOADED,
 	PROGRAMMER_UNLOADED,
 	SEARCH_BUG,
+	SET_PAGE
 } from '../constants/actionTypes';
 
 export default (state = {}, action) => {
@@ -44,7 +45,7 @@ export default (state = {}, action) => {
 		case SEARCH_BUG:
 			return {
 				...state,
-				bugs: action.payload[0]
+				bugs: action.payload[1]
 			};
 		case CLEAR_TAG_FILTER:
 			return {
@@ -56,6 +57,11 @@ export default (state = {}, action) => {
 				...state,
 				bugs: action.payload[1]
 			};
+		case SET_PAGE:
+			return {
+				...state,
+				bugs: action.payload
+			}
 		case HOME_PAGE_UNLOADED:
 			return {};
 		default:

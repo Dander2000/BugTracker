@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom';
-import ListErrors from './ListErrors';
+import ListErrors from './../ListErrors';
 import React from 'react';
-import agent from '../agent';
+import agent from '../../agent';
 import { connect } from 'react-redux';
-import { validate } from "./Register/validate";
+import { validate } from "./validate";
 import {
 	UPDATE_FIELD_AUTH,
 	REGISTER,
 	ERROR,
 	REGISTER_PAGE_UNLOADED
-} from '../constants/actionTypes';
+} from './../../constants/actionTypes';
 
 const Promise = global.Promise;
 

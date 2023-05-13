@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import Banner from './Banner';
 import MainView from './MainView';
 import React from 'react';
@@ -28,10 +28,10 @@ const mapDispatchToProps = dispatch => ({
 		dispatch({ type: SEARCH_BUG, tag, payload }),
 	onClearTag: (tag, payload) =>
 		dispatch({ type: CLEAR_TAG_FILTER, tag, payload }),
-	onClickTag: (tag, pager, payload) =>
-		dispatch({ type: APPLY_TAG_FILTER, tag, pager, payload }),
-	onLoad: (tag, pager, payload) =>
-		dispatch({ type: HOME_PAGE_LOADED, tag, pager, payload }),
+	onClickTag: (tag, payload) =>
+		dispatch({ type: APPLY_TAG_FILTER, tag, payload }),
+	onLoad: (tag, payload) =>
+		dispatch({ type: HOME_PAGE_LOADED, tag, payload }),
 	onUnload: () =>
 		dispatch({ type: HOME_PAGE_UNLOADED }),
 	onUpdateField: (key, value) =>
@@ -41,7 +41,8 @@ const mapDispatchToProps = dispatch => ({
 const ClearTags = props => {
 	const clearHandler = ev => {
 		// ev.preventDefault();
-		props.onClearTag("all", agent.Bugs.all());
+		document.getElementById('searchBug').value = '';
+		props.onClearTag("all", agent.Bugs.all(props.currentPage));
 	}
 	return (
 		<button onClick={clearHandler} className={props.tag === "all" ? "btn-active" : null}>
@@ -59,16 +60,16 @@ class Home extends React.Component {
 			};
 		this.onSearchChange = updateFieldEvent('searchBug');
 
-		this.props.onLoad("all", agent.Bugs.all, Promise.all([
+		this.props.onLoad("all", Promise.all([
 			agent.Tags.all(),
-			agent.Bugs.all()
-		]),);
+			agent.Bugs.all(this.props.currentPage)
+		]));
 
 		this.submitForm = ev => {
 			// ev.persist();
 			this.props.onSearch(this.props.tag, Promise.all([
-				agent.Bugs.search(this.props.searchBug, this.props.tag),
-				agent.Tags.all()
+				agent.Tags.all(),
+				agent.Bugs.search(this.props.searchBug, this.props.tag, this.props.currentPage)
 			]));
 		}
 	}
@@ -117,7 +118,12 @@ class Home extends React.Component {
 					currentUser={this.props.currentUser} />
 				<div className="container page">
 					<div className="row">
-						<MainView currentUser={this.props.currentUser} />
+						<MainView
+							currentUser={this.props.currentUser}
+							bugsCount={this.props.bugsCount}
+							pager={agent.Bugs.search}
+							currentPage={this.props.currentPage}
+						/>
 						<div className="col-md-3">
 							<div className="sidebar">
 								<p>Popular Tags</p>
@@ -126,6 +132,7 @@ class Home extends React.Component {
 									onClickTag={this.props.onClickTag} /><br />
 								<ClearTags
 									tag={this.props.tag}
+									currentPage={this.props.currentPage}
 									onClearTag={this.props.onClearTag} />
 							</div>
 						</div>

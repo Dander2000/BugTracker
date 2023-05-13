@@ -37,29 +37,60 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     getBugs(res);
 }));
-router.get(`/bugtype/:tag&:term`, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const term = req.params.term;
+// NOW
+router.get(`/bugtype/:tag&:term&:page`, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const term = req.params.term === undefined ? " " : req.params.term;
+    let page = req.params.page;
+    if (req.params.page === "") {
+        page = 0;
+    }
     let tag = req.params.tag;
     if (req.params.tag === "all") {
         tag = null;
     }
-    getBugsSearch(res, term, tag);
+    console.log(term, page, tag);
+    const offset = parseInt(page) * 5;
+    getBugsSearch(res, term, tag, offset);
 }));
+// NOW
 router.get('/bugtype/:bugtype', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.bugtype;
-    getBugsBugType(res, id);
+    // let page = req.params.page;
+    // if (req.params.page === "") {
+    // 	page = 0;
+    // }
+    // const offset = page * 10;
+    getBugsBugType(res, id); //offset
 }));
+// NOW
 router.get('/app/:app', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.app;
-    getBugsApp(res, id);
+    // let page = req.params.page;
+    // if (req.params.page === "") {
+    // 	page = 0;
+    // }
+    // const offset = page * 10;
+    getBugsApp(res, id); //offset
 }));
+// NOW
 router.get('/programmer/:developer', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.developer;
-    getBugsDeveloper(res, id);
+    // let page = req.params.page;
+    // if (req.params.page === "") {
+    // 	page = 0;
+    // }
+    // const offset = page * 10;
+    getBugsDeveloper(res, id); //
 }));
+// NOW
 router.get('/user/:reporter', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.reporter;
-    getBugsReporter(res, id);
+    // let page = req.params.page;
+    // if (req.params.page === "") {
+    // 	page = 0;
+    // }
+    // const offset = page * 10;
+    getBugsReporter(res, id); //offset
 }));
 router.use((err, req, res, next) => {
     console.error(err.stack);

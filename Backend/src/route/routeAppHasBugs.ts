@@ -46,34 +46,61 @@ router.get('/:id', async (req: any, res: any) => {
 router.get('/', async (req: any, res: any) => {
 	getBugs(res);
 });
-
-router.get(`/bugtype/:tag&:term`, async (req: any, res: any) => {
-	const term = req.params.term;
+// NOW
+router.get(`/bugtype/:tag&:term&:page`, async (req: any, res: any) => {
+	const term = req.params.term === undefined ? " ": req.params.term;
+	
+	let page = req.params.page;
+	if (req.params.page === "") {
+		page = 0;
+	}
 	let tag = req.params.tag;
 	if (req.params.tag === "all") {
 		tag = null;
 	}
-	getBugsSearch(res, term, tag);
+	console.log(term,page,tag);
+	const offset = parseInt(page) * 5;
+	getBugsSearch(res, term, tag, offset);
 });
-
+// NOW
 router.get('/bugtype/:bugtype', async (req: any, res: any) => {
     const id = req.params.bugtype;
-    getBugsBugType(res, id);
+	// let page = req.params.page;
+	// if (req.params.page === "") {
+	// 	page = 0;
+	// }
+	// const offset = page * 10;
+    getBugsBugType(res, id);//offset
 });
-
+// NOW
 router.get('/app/:app', async (req: any, res: any) => {
     const id = req.params.app;
-    getBugsApp(res, id);
+	// let page = req.params.page;
+	// if (req.params.page === "") {
+	// 	page = 0;
+	// }
+	// const offset = page * 10;
+    getBugsApp(res, id);//offset
 });
-
+// NOW
 router.get('/programmer/:developer', async (req: any, res: any) => {
     const id = req.params.developer;
-    getBugsDeveloper(res, id);
+	// let page = req.params.page;
+	// if (req.params.page === "") {
+	// 	page = 0;
+	// }
+	// const offset = page * 10;
+    getBugsDeveloper(res, id);//
 });
-
+// NOW
 router.get('/user/:reporter', async (req: any, res: any) => {
     const id = req.params.reporter;
-    getBugsReporter(res, id);
+	// let page = req.params.page;
+	// if (req.params.page === "") {
+	// 	page = 0;
+	// }
+	// const offset = page * 10;
+    getBugsReporter(res, id);//offset
 });
 
 router.use((err: Error, req: Request, res: Response, next: NextFunction) => {

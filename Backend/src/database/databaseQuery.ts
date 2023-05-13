@@ -3,7 +3,9 @@ const database = require('./databaseConnection.js');
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET;
 
-module.exports.insertBugs = async (response:any,details:any, appId:any, bugId:any, userId:any ) => {
+/** PRZENIESIONE */
+//#region 
+module.exports.insertBugs = async (response:any, details:any, appId:any, bugId:any, userId:any ) => {
     database.pool.query(`INSERT INTO app_has_bug
     (idBug, appId, bugId, ProgressingBy, details, finished, createdBy, createdAt, lastUpdate)
 	VALUES
@@ -13,7 +15,7 @@ module.exports.insertBugs = async (response:any,details:any, appId:any, bugId:an
     });
 }
 
-module.exports.insertApp = async (response:any,name:any, description:any,  ) => {
+module.exports.insertApp = async (response:any, name:any, description:any ) => {
     database.pool.query(`INSERT INTO app
 	(idApp,name,description,appState)
 	VALUES 
@@ -22,7 +24,6 @@ module.exports.insertApp = async (response:any,name:any, description:any,  ) => 
         response.send(JSON.parse(('{\"Succes\":'+JSON.stringify(r)+'}')));
     });
 }
-
 module.exports.assignBug = async (response:any, bugId:any, userId:any ) => {
     database.pool.query(`UPDATE app_has_bug SET
     ProgressingBy = ${userId}
@@ -31,17 +32,15 @@ module.exports.assignBug = async (response:any, bugId:any, userId:any ) => {
         response.send(JSON.parse(('{\"Succes\":'+JSON.stringify(r)+'}')));
     });
 }
-
 module.exports.assignApp = async (response:any, appId:any, userId:any ) => {
     database.pool.query(`INSERT INTO app_has_specialist 
-	( App_idApp, User_idUser )
-	VALUES(
+    ( App_idApp, User_idUser )
+    VALUES(
     ${appId}, ${userId})`, function(e:Error,r:any,f:any){
         if(e) throw e;
         response.send(JSON.parse(('{\"Succes\":'+JSON.stringify(r)+'}')));
     });
 }
-
 module.exports.changeStateApp = async (response:any, appId:any, newAppState:any ) => {
     database.pool.query(`UPDATE app SET
 	appState=${newAppState} WHERE idApp=${appId}`, function(e:Error,r:any,f:any){
@@ -49,7 +48,6 @@ module.exports.changeStateApp = async (response:any, appId:any, newAppState:any 
         response.send(JSON.parse(('{\"Succes\":'+JSON.stringify(r)+'}')));
     });
 }
-
 module.exports.finishBug = async (response:any, bugId:any ) => {
     database.pool.query(`UPDATE app_has_bug 
 	SET finished = 1 
@@ -58,7 +56,6 @@ module.exports.finishBug = async (response:any, bugId:any ) => {
         response.send(JSON.parse(('{\"Succes\":'+JSON.stringify(r)+'}')));
     });
 }
-
 module.exports.insertUser = async (response:any,firstName:any, surname:any, nick:any, mail:any, pass:any) => {
     if (!nick) {
 		database.pool.query(`INSERT INTO user
@@ -89,9 +86,7 @@ module.exports.insertUser = async (response:any,firstName:any, surname:any, nick
 			}
 		)
 	};
-}	
-
-
+}
 module.exports.getMyApp = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -103,7 +98,6 @@ module.exports.getMyApp = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"apps\":'+JSON.stringify(r)+'}')));
     });
 }
-
 module.exports.getMyApps = async (response:any) => {
     database.pool.query(`SELECT
     * 
@@ -113,7 +107,6 @@ module.exports.getMyApps = async (response:any) => {
         response.send(JSON.parse(('{\"apps\":'+JSON.stringify(r)+'}')));        
     });
 }
-
 module.exports.getBug = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -125,43 +118,64 @@ module.exports.getBug = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getBugsBugType = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
     FROM
     bugs
     WHERE
-    bugId = ${id} ORDER BY idBug DESC`, function(e:Error,r:any,f:any){
+    title = \'${id}\' ORDER BY idBug DESC`, function(e:Error,r:any,f:any){
         if(e) throw e;
-        response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
+        database.pool.query(`SELECT
+    	    COUNT(*) as counter
+    	    FROM
+    	    bugs
+    	    WHERE
+    	    title = \'${id}\' `, function(er:Error,re:any,fu:any){
+        	    response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+',\"counter\":'+JSON.stringify(re)+'}')));
+            });
+        // response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 }
-
-module.exports.getBugsSearch = async (response:any,id:any, tag:any) => {
+module.exports.getBugsSearch = async (response:any,id:any, tag:any, offset:any ) => {
 	if (tag) {
 		database.pool.query(`SELECT
     	* 
     	FROM
     	bugs
     	WHERE
-    	details LIKE \'\%${id}\%\' AND title = \'${tag}\' ORDER BY idBug DESC`, function(e:Error,r:any,f:any){
+    	details LIKE \'\%${id}\%\' AND title = \'${tag}\' 
+        ORDER BY idBug DESC LIMIT 5 OFFSET ${offset}`, function(e:Error,r:any,f:any){
         	if(e) throw e;
-        	response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
-    	});
+            database.pool.query(`SELECT
+    	    COUNT(*) as counter
+    	    FROM
+    	    bugs
+    	    WHERE
+    	    details LIKE \'\%${id}\%\' AND title = \'${tag}\' `, function(er:Error,re:any,fu:any){
+        	    response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+',\"counter\":'+JSON.stringify(re)+'}')));
+            });
+        });
 	}else{
 		database.pool.query(`SELECT
 		* 
 		FROM
 		bugs
 		WHERE
-		details LIKE \'\%${id}\%\' ORDER BY idBug DESC`, function(e:Error,r:any,f:any){
+		details LIKE \'\%${id}\%\' 
+        ORDER BY idBug DESC LIMIT 5 OFFSET ${offset}`, function(e:Error,r:any,f:any){
 			if(e) throw e;
-			response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
+			database.pool.query(`SELECT
+    	    COUNT(*) as counter
+    	    FROM
+    	    bugs
+    	    WHERE
+    	    details LIKE \'\%${id}\%\'`, function(er:Error,re:any,fu:any){
+        	    response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+',\"counter\":'+JSON.stringify(re)+'}')));
+            });     
 		});
 	}
 }
-
 module.exports.getBugsApp = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -173,7 +187,6 @@ module.exports.getBugsApp = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getBugsDeveloper = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -185,7 +198,6 @@ module.exports.getBugsDeveloper = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getBugsReporter = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -197,17 +209,16 @@ module.exports.getBugsReporter = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getBugs = async (response:any) => {
     database.pool.query(`SELECT
     * 
     FROM
-    bugs ORDER BY idBug DESC`, function(e:Error,r:Response,f:any){
+    bugs ORDER BY idBug DESC
+    LIMIT 5`, function(e:Error,r:Response,f:any){
         if(e) throw e;
         response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getMyAppHasSpecialists = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -219,7 +230,6 @@ module.exports.getMyAppHasSpecialists = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"programmers\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getMyAppsHasSpecialist = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -231,17 +241,6 @@ module.exports.getMyAppsHasSpecialist = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"programmers\":'+JSON.stringify(r)+'}')));       
     });
 }
-
-module.exports.getMyAppsHasSpecialists = async (response:any) => {
-    database.pool.query(`SELECT
-    * 
-    FROM
-    app_has_specialist`, function(e:Error,r:any,f:any){
-        if(e) throw e;
-        response.send(JSON.parse(('{\"programmers\":'+JSON.stringify(r)+'}')));       
-    });
-}
-
 module.exports.getBugType = async (response:any,id:any) => {
     database.pool.query(`SELECT
     * 
@@ -253,7 +252,6 @@ module.exports.getBugType = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"bugtypes\":'+JSON.stringify(r)+'}')));         
     });
 }
-
 module.exports.getBugTypes = async (response:any) => {
     database.pool.query(`SELECT
     * 
@@ -274,7 +272,6 @@ module.exports.getPrivilege = async (response:any,id:any) => {
         response.send(JSON.parse(('{\"privileges\":'+JSON.stringify(r)+'}')));       
     });
 }
-
 module.exports.getPrivileges = async (response:any) => {
     database.pool.query(`SELECT
     * 
@@ -282,6 +279,17 @@ module.exports.getPrivileges = async (response:any) => {
     privilege`, function(e:Error,r:Response,f:any){
         if(e) throw e;
         response.send(JSON.parse(('{\"privileges\":'+JSON.stringify(r)+'}')));        
+    });
+}
+//#endregion
+
+module.exports.getMyAppsHasSpecialists = async (response:any) => {
+    database.pool.query(`SELECT
+    * 
+    FROM
+    app_has_specialist`, function(e:Error,r:any,f:any){
+        if(e) throw e;
+        response.send(JSON.parse(('{\"programmers\":'+JSON.stringify(r)+'}')));       
     });
 }
 

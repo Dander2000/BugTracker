@@ -1,5 +1,14 @@
 import React from 'react';
 import agent from '../../agent';
+import { connect } from 'react-redux';
+
+const mapStateToProps = state => ({
+	...state.home
+});
+
+const mapDispatchToProps = dispatch => ({
+	// onTabClick: (tab, pager, payload) => dispatch({ type: CHANGE_TAB, tab, pager, payload })
+});
 
 const Tags = props => {
 	if (!props.tags) {
@@ -14,8 +23,9 @@ const Tags = props => {
 				tags.map(bug => {
 					const handleClick = ev => {
 						const tag = bug.title;
+						const searchBar = props.searchBug ? props.searchBug : ' ';
 						ev.preventDefault();
-						props.onClickTag(tag, bug => agent.Bugs.byTag(bug.idBug), agent.Bugs.byTag(bug.idBug));
+						props.onClickTag(tag, agent.Bugs.search(searchBar, bug.title, props.currentPage));
 					};
 
 					return (
@@ -35,4 +45,5 @@ const Tags = props => {
 	);
 };
 
-export default Tags;
+export default connect(mapStateToProps, mapDispatchToProps)(Tags);
+// export default Tags;

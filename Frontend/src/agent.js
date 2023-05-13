@@ -25,7 +25,7 @@ const requests = {
 		superagent.post(`${API_ROOT}${url}`, body).use(tokenPlugin).then(responseBody)
 };
 
-const limit = (count, p) => `limit=${count}&offset=${p ? p * count : 0}`;
+// const limit = (count, p) => `limit=${count}&offset=${p ? p * count : 0}`;
 
 const Apps = {
 	add: (name, description) =>
@@ -52,12 +52,13 @@ const Bugs = {
 		requests.get(`/bugs/create/${details}&${appId}&${bugId}&${userId}`),
 	assign: (bugId, userId) =>
 		requests.get(`/bugs/assign/${bugId}&${userId}`),
-	all: () =>
-		requests.get(`/bugs?${limit(10, 0)}`),//TODO List pagination
+	all: (page = 0) =>
+		requests.get(`/bugs/bugtype/all& &${page}`),//TODO List pagination
+	// requests.get(`/bugs/${page}`),
 	byAuthor: (author) =>
 		requests.get(`/bugs/user/${author}`),//TODO List pagination
-	byTag: (tag) =>
-		requests.get(`/bugs/bugtype/${tag}`),//TODO List pagination
+	// byTag: (tag, page) =>
+	// 	requests.get(`/bugs/bugtype/${tag}&${page}`),//TODO List pagination
 	byApp: (app) =>
 		requests.get(`/bugs/app/${app}`),//TODO List pagination
 	byProgrammer: (programmer) =>
@@ -69,8 +70,11 @@ const Bugs = {
 		requests.get(`/bugs/finish/${id}`),
 	get: id =>
 		requests.get(`/bugs/${id}`),
-	search: (id, tag) =>
-		requests.get(`/bugs/bugtype/${tag}&${id}`)//TODO List pagination
+	search: (term, tag, page) =>{
+		term = term == "" ? " " : term;
+		return requests.get(`/bugs/bugtype/${tag}&${term}&${page}`)//TODO List pagination
+	}
+		
 }
 
 const Users = {

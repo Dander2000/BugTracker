@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const database = require('./databaseConnection.js');
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET;
+/** PRZENIESIONE */
+//#region 
 module.exports.insertBugs = (response, details, appId, bugId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     database.pool.query(`INSERT INTO app_has_bug
     (idBug, appId, bugId, ProgressingBy, details, finished, createdBy, createdAt, lastUpdate)
@@ -42,8 +44,8 @@ module.exports.assignBug = (response, bugId, userId) => __awaiter(void 0, void 0
 });
 module.exports.assignApp = (response, appId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     database.pool.query(`INSERT INTO app_has_specialist 
-	( App_idApp, User_idUser )
-	VALUES(
+    ( App_idApp, User_idUser )
+    VALUES(
     ${appId}, ${userId})`, function (e, r, f) {
         if (e)
             throw e;
@@ -140,23 +142,39 @@ module.exports.getBugsBugType = (response, id) => __awaiter(void 0, void 0, void
     FROM
     bugs
     WHERE
-    bugId = ${id} ORDER BY idBug DESC`, function (e, r, f) {
+    title = \'${id}\' ORDER BY idBug DESC`, function (e, r, f) {
         if (e)
             throw e;
-        response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + '}')));
+        database.pool.query(`SELECT
+    	    COUNT(*) as counter
+    	    FROM
+    	    bugs
+    	    WHERE
+    	    title = \'${id}\' `, function (er, re, fu) {
+            response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + ',\"counter\":' + JSON.stringify(re) + '}')));
+        });
+        // response.send(JSON.parse(('{\"bugs\":'+JSON.stringify(r)+'}')));       
     });
 });
-module.exports.getBugsSearch = (response, id, tag) => __awaiter(void 0, void 0, void 0, function* () {
+module.exports.getBugsSearch = (response, id, tag, offset) => __awaiter(void 0, void 0, void 0, function* () {
     if (tag) {
         database.pool.query(`SELECT
     	* 
     	FROM
     	bugs
     	WHERE
-    	details LIKE \'\%${id}\%\' AND title = \'${tag}\' ORDER BY idBug DESC`, function (e, r, f) {
+    	details LIKE \'\%${id}\%\' AND title = \'${tag}\' 
+        ORDER BY idBug DESC LIMIT 5 OFFSET ${offset}`, function (e, r, f) {
             if (e)
                 throw e;
-            response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + '}')));
+            database.pool.query(`SELECT
+    	    COUNT(*) as counter
+    	    FROM
+    	    bugs
+    	    WHERE
+    	    details LIKE \'\%${id}\%\' AND title = \'${tag}\' `, function (er, re, fu) {
+                response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + ',\"counter\":' + JSON.stringify(re) + '}')));
+            });
         });
     }
     else {
@@ -165,10 +183,18 @@ module.exports.getBugsSearch = (response, id, tag) => __awaiter(void 0, void 0, 
 		FROM
 		bugs
 		WHERE
-		details LIKE \'\%${id}\%\' ORDER BY idBug DESC`, function (e, r, f) {
+		details LIKE \'\%${id}\%\' 
+        ORDER BY idBug DESC LIMIT 5 OFFSET ${offset}`, function (e, r, f) {
             if (e)
                 throw e;
-            response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + '}')));
+            database.pool.query(`SELECT
+    	    COUNT(*) as counter
+    	    FROM
+    	    bugs
+    	    WHERE
+    	    details LIKE \'\%${id}\%\'`, function (er, re, fu) {
+                response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + ',\"counter\":' + JSON.stringify(re) + '}')));
+            });
         });
     }
 });
@@ -212,7 +238,8 @@ module.exports.getBugs = (response) => __awaiter(void 0, void 0, void 0, functio
     database.pool.query(`SELECT
     * 
     FROM
-    bugs ORDER BY idBug DESC`, function (e, r, f) {
+    bugs ORDER BY idBug DESC
+    LIMIT 5`, function (e, r, f) {
         if (e)
             throw e;
         response.send(JSON.parse(('{\"bugs\":' + JSON.stringify(r) + '}')));
@@ -237,16 +264,6 @@ module.exports.getMyAppsHasSpecialist = (response, id) => __awaiter(void 0, void
     apps_of_programmer
     WHERE
     User_idUser = ?`, [id], function (e, r, f) {
-        if (e)
-            throw e;
-        response.send(JSON.parse(('{\"programmers\":' + JSON.stringify(r) + '}')));
-    });
-});
-module.exports.getMyAppsHasSpecialists = (response) => __awaiter(void 0, void 0, void 0, function* () {
-    database.pool.query(`SELECT
-    * 
-    FROM
-    app_has_specialist`, function (e, r, f) {
         if (e)
             throw e;
         response.send(JSON.parse(('{\"programmers\":' + JSON.stringify(r) + '}')));
@@ -294,6 +311,17 @@ module.exports.getPrivileges = (response) => __awaiter(void 0, void 0, void 0, f
         if (e)
             throw e;
         response.send(JSON.parse(('{\"privileges\":' + JSON.stringify(r) + '}')));
+    });
+});
+//#endregion
+module.exports.getMyAppsHasSpecialists = (response) => __awaiter(void 0, void 0, void 0, function* () {
+    database.pool.query(`SELECT
+    * 
+    FROM
+    app_has_specialist`, function (e, r, f) {
+        if (e)
+            throw e;
+        response.send(JSON.parse(('{\"programmers\":' + JSON.stringify(r) + '}')));
     });
 });
 module.exports.getAuth = (response, mail, pass) => __awaiter(void 0, void 0, void 0, function* () {

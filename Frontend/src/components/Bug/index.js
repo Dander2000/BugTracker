@@ -53,7 +53,7 @@ const ProgrammerDetails = props => {
 			</div>
 			<div className='col-md-8'>
 				<i>
-					<Link to={'users/' + props.bug.ProgressingBy}>
+					<Link to={'/users/' + props.bug.ProgressingBy}>
 						{props.bug.programmerName}	"{props.bug.programmerNick}" {props.bug.programmerSurname}<br />
 						Mail: {props.bug.programmerMail}<br />
 					</Link>
@@ -62,6 +62,7 @@ const ProgrammerDetails = props => {
 		</article>
 	);
 }
+
 
 const Assigning = props => {
 	if (props.bug.finished.data[0]) {
