@@ -3,33 +3,37 @@ import agent from '../agent';
 import { connect } from 'react-redux';
 import { SET_PAGE } from '../constants/actionTypes';
 
+const mapStateToProps = state => ({
+  ...state.home
+});
+
 const mapDispatchToProps = dispatch => ({
   onSetPage: (page, payload) =>
     dispatch({ type: SET_PAGE, page, payload })
 });
 
 const ListPagination = props => {
-  if (props.articlesCount <= 10) {
+  if (props.itemsCounter <= 5) {
     return null;
   }
 
   const range = [];
-  for (let i = 0; i < Math.ceil(props.articlesCount / 10); ++i) {
+  for (let i = 0; i < Math.ceil(props.itemsCounter / 5); ++i) {
     range.push(i);
   }
 
   const setPage = page => {
-    if(props.pager) {
-      props.onSetPage(page, props.pager(page));
-    }else {
-      props.onSetPage(page, agent.Articles.all(page))
+    if (props.pager) {
+      //agent.Bugs.search(props.searchBug, props.tag, page)
+      props.onSetPage(page, props.pager(props.searchBug, props.tag, page));
+    } else {
+      props.onSetPage(page, agent.Bugs.all(page))
     }
   };
 
   return (
     <nav>
       <ul className="pagination">
-
         {
           range.map(v => {
             const isCurrent = v === props.currentPage;
@@ -39,7 +43,7 @@ const ListPagination = props => {
             };
             return (
               <li
-                className={ isCurrent ? 'page-item active' : 'page-item' }
+                className={isCurrent ? 'page-item active' : 'page-item'}
                 onClick={onClick}
                 key={v.toString()}>
 
@@ -49,10 +53,9 @@ const ListPagination = props => {
             );
           })
         }
-
       </ul>
     </nav>
   );
 };
 
-export default connect(() => ({}), mapDispatchToProps)(ListPagination);
+export default connect(mapStateToProps, mapDispatchToProps)(ListPagination);

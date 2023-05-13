@@ -22,10 +22,10 @@ const MainView = props => {
 	return (
 		<div className="col-md-9">
 			<BugList
-				pager={props.pager}
 				bugs={props.bugs.bugs}
 				loading={props.loading}
 				bugsCount={props.bugsCount}
+				pager={props.pager}
 				currentPage={props.currentPage}
 				currentUser={props.currentUser} />
 		</div>

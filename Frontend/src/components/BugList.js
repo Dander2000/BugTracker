@@ -1,5 +1,6 @@
 import BugPreview from './BugPreview';
 import React from 'react';
+import ListPagination from './ListPagination';
 
 const BugList = props => {
 	if (!props.bugs) {
@@ -26,9 +27,13 @@ const BugList = props => {
 					)
 				})
 			}
+			<ListPagination
+				itemsCounter={props.bugsCount}
+				pager={props.pager}
+				currentPage={props.currentPage} />
 		</div>
+
 	);
 };
 
 export default BugList;
-

@@ -28,7 +28,6 @@ router.get('/downgrade/:id&:appState', (req, res) => __awaiter(void 0, void 0, v
     changeStateApp(res, id, appState);
 }));
 router.get(`/assign/:appId&:userId`, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("id did assign, at least tried...");
     const appId = req.params.appId;
     const userId = req.params.userId;
     assignApp(res, appId, userId);

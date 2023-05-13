@@ -1,0 +1,11 @@
+import { pool } from './databaseConnection.js';
+
+module.exports.assignApp = async (response:any, appId:any, userId:any ) => {
+    pool.query(`INSERT INTO app_has_specialist 
+	( App_idApp, User_idUser )
+	VALUES(
+    ${appId}, ${userId})`, function(e:Error,r:any,f:any){
+        if(e) throw e;
+        response.send(JSON.parse(('{\"Succes\":'+JSON.stringify(r)+'}')));
+    });
+}

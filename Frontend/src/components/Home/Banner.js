@@ -7,6 +7,7 @@ const Search = ({ onClick, onChange, value }) => {
 				<input
 					className='form-control'
 					type='text'
+					id='searchBug'
 					name='searchBug'
 					placeholder='What bug you loking for?'
 					value={value}

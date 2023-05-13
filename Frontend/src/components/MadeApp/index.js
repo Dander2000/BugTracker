@@ -21,6 +21,7 @@ const mapDispatchToProps = dispatch => ({
 
 class MadeApp extends React.Component {
 	componentDidMount() {
+		console.log(this.props.match.params.id);
 		this.props.onLoad(Promise.all([
 			agent.Apps.get(this.props.match.params.id),
 			agent.Users.appProgrammers(this.props.match.params.id),

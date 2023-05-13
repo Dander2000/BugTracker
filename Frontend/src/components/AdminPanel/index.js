@@ -10,7 +10,6 @@ import {
 import { Redirect } from 'react-router-dom';
 import ProgrammerList from '../ProgrammerList';
 import AppsAssign from './appsAssign';
-import AppList from '../AppList';
 
 const Promise = global.Promise;
 
